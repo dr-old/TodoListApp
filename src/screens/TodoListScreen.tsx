@@ -13,6 +13,8 @@ import {fetchTodos} from '../services/api';
 import {Divider, ErrorMessage, ListItem, LoadingIndicator} from '../components';
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../utils/Theme';
+import {useAsyncStorage} from '../hooks/useAsyncStorage';
+import {useAuthStore} from '../stores/auth/authStore';
 
 interface Todo {
   id: number;
@@ -21,6 +23,8 @@ interface Todo {
 }
 
 const TodoListScreen = () => {
+  const {setUser} = useAuthStore();
+  const getData = useAsyncStorage('users');
   const {isPending, error, data, refetch} = useQuery<Todo[], Error>({
     queryKey: ['todos'],
     queryFn: fetchTodos,
@@ -31,6 +35,10 @@ const TodoListScreen = () => {
 
   const handleAddTodo = () => {
     navigation.push('TodoAdd', {todo: null});
+  };
+
+  const handleLogout = () => {
+    setUser(null);
   };
 
   const onListItemPress = React.useCallback(
@@ -61,9 +69,16 @@ const TodoListScreen = () => {
           />
         ))}
       </ScrollView>
-      <TouchableOpacity onPress={handleAddTodo} style={[styles.button]}>
-        <Text style={styles.buttonText}>Add Todo</Text>
-      </TouchableOpacity>
+      <View style={{marginTop: 20, marginHorizontal: 20}}>
+        <TouchableOpacity onPress={handleAddTodo} style={[styles.button]}>
+          <Text style={styles.buttonText}>Add Todo</Text>
+        </TouchableOpacity>
+        <Divider height={5} />
+        <TouchableOpacity onPress={handleLogout} style={[styles.logout]}>
+          <Text style={styles.buttonTextBlue}>Logout</Text>
+        </TouchableOpacity>
+        <Divider height={5} />
+      </View>
     </View>
   );
 };
@@ -88,10 +103,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 15,
-    margin: 20,
     backgroundColor: colors.blue,
   },
+  logout: {
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+  },
   buttonText: {color: colors.white, fontSize: 16, fontWeight: '700'},
+  buttonTextBlue: {color: colors.blue, fontSize: 16, fontWeight: '700'},
   red: {
     backgroundColor: colors.red1,
   },

@@ -1,18 +1,17 @@
 import * as React from 'react';
 
 import {NavigationContainer} from '@react-navigation/native';
-import {LoginStack} from './LoginStack';
-import {useAsyncStorage} from '../hooks/useAsyncStorage';
 import {MainStack} from './MainStack';
+import {useAuthStore} from '../stores/auth/authStore';
+import {LoginStack} from './LoginStack';
 
 export function Routes() {
-  const {data} = useAsyncStorage('users');
-
-  console.log(data);
+  const {user} = useAuthStore();
+  console.log('login', user);
 
   return (
     <NavigationContainer>
-      {data?.token ? <MainStack /> : <LoginStack />}
+      {user?.token ? <MainStack /> : <LoginStack />}
     </NavigationContainer>
   );
 }

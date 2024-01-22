@@ -12,7 +12,8 @@ import {Divider} from '../components';
 import {useMutation} from '@tanstack/react-query';
 import {login} from '../services/api';
 import Toast from 'react-native-toast-message';
-import {storeData} from '../utils/Storage';
+import {useNavigation} from '@react-navigation/native';
+import {useAuthStore} from '../stores/auth/authStore';
 
 const Required = () => {
   return (
@@ -33,6 +34,8 @@ export default function LoginScreen() {
       password: '',
     },
   });
+  const {setUser} = useAuthStore();
+  const navigation = useNavigation();
 
   const onSubmit = data => {
     loginMutation.mutate(data);
@@ -41,7 +44,12 @@ export default function LoginScreen() {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: async data => {
-      storeData('users', data);
+      setUser(data);
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Login successfull',
+      });
     },
     onError(error) {
       console.log('error', error);
